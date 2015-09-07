@@ -31,9 +31,9 @@ from alignak.log import logger
 
 properties = {
     # Which daemon can load this module
-    'daemons': ['arbiter'],
+    'daemons': ['arbiter', 'broker', 'scheduler', 'poller', 'receiver', 'reactionner'],
     # name of the module type ; to distinguish between them:
-    'type': 'exemple',
+    'type': 'example',
      # is the module "external" (external means here a daemon module)
     'external': False,
     # Possible configuration phases where the module is involved:
