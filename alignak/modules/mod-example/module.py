@@ -35,7 +35,7 @@ properties = {
     # name of the module type ; to distinguish between them:
     'type': 'example',
      # is the module "external" (external means here a daemon module)
-    'external': False,
+    'external': True,
     # Possible configuration phases where the module is involved:
     'phases': ['configuration', 'late_configuration', 'running', 'retention'],
 }
