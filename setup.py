@@ -29,7 +29,7 @@ with open(ver_file) as fh:
 
 os.environ['PBR_VERSION'] = VERSION
 
-packages = find_packages()
+packages = find_packages(exclude=['alignak', 'alignak.modules'])
 setuptools.setup(
     setup_requires=['pbr'],
     packages=packages,
