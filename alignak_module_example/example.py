@@ -104,19 +104,19 @@ class Example(BaseModule):
         pass
     def load_retention_objects(self):
         pass
-    def hook_save_retention(self):
+    def hook_save_retention(self, scheduler):
         logger.info("[Dummy Arbiter] Raise a external command as example")
-    def hook_load_retention(self):
+    def hook_load_retention(self, scheduler):
         logger.info("[Dummy Arbiter] Raise a external command as example")
-    def hook_get_new_actions(self):
+    def hook_get_new_actions(self, scheduler):
         logger.info("[Dummy Arbiter] Raise a external command as example")
-    def hook_pre_scheduler_mod_start(self):
+    def hook_pre_scheduler_mod_start(self, scheduler):
         logger.info("[Dummy Arbiter] Raise a external command as example")
-    def hook_scheduler_tick(self):
+    def hook_scheduler_tick(self, scheduler):
         logger.info("[Dummy Arbiter] Raise a external command as example")
-    def hook_tick(self):
+    def hook_tick(self, scheduler):
         logger.info("[Dummy Arbiter] Dummy in hook late config")
-    def do_loop_turn(self):
+    def do_loop_turn(self, scheduler):
         logger.info("[Dummy Arbiter] Raise a external command as example")
         time.sleep(0.1)       
 
