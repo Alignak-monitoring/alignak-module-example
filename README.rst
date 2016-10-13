@@ -1,7 +1,161 @@
-===================
-Alignak mod-example
-===================
+Alignak Example Module
+======================
 
-This is example of Alignak module
+*Alignak example module*
+
+Build status (stable release)
+-----------------------------
+
+.. image:: https://travis-ci.org/Alignak-monitoring/alignak-module-example.svg?branch=master
+    :target: https://travis-ci.org/Alignak-monitoring/alignak-module-example
 
 
+Build status (development release)
+----------------------------------
+
+.. image:: https://travis-ci.org/Alignak-monitoring-contrib/alignak-module-example.svg?branch=develop
+    :target: https://travis-ci.org/Alignak-monitoring-contrib/alignak-module-example
+
+
+Short description
+-----------------
+
+This module is an example skelleton to build Alignak modules ...
+
+
+Packaging
+---------
+
+Repositories
+~~~~~~~~~~~~
+
+All Alignak modules are stored in their own repository in the `Alignak monitoring contrib`_ Github organization.
+
+
+Repository example
+~~~~~~~~~~~~~~~~~~
+Repository directories and files example:
+::
+
+    README.rst
+    LICENCE
+    AUTHORS
+    requirements.txt
+    setup.py
+    version.py
+
+    alignak_module_EXAMPLE/
+        ALIGNAKETC/
+            arbiter/
+                modules/
+                    mod-EXAMPLE.cfg
+        __init__.py
+        EXAMPLE.py
+
+The content of the directory ``alignak_checks_EXAMPLE/ALIGNAKETC`` (including files and sub
+directories) will be copied to */usr/local/var/etc/alignak*.
+
+
+Building
+~~~~~~~~
+
+To build a new module EXAMPLE2:
+
+    * create a new ``alignak-module-EXAMPLE2`` repository which is a copy of this repository
+
+        * rename the ``alignak_module_EXAMPLE`` directory to ``alignak_module_EXAMPLE2``
+
+    * update the ``version.py`` file
+
+        * edit the ``__pkg_name__`` and the ``module_type`` variables
+
+    * update the ``MANIFEST.in`` file
+
+        * rename the ``alignak_module_EXAMPLE`` directory to ``alignak_module_EXAMPLE2``
+
+    * update the ``README.rst`` file
+
+        * remove this section **Packaging**
+        * search and replace ``EXAMPLE`` with ``EXAMPLE2``
+        * complete the **Documentation** chapter
+
+    * update the ``alignak_module_EXAMPLE2/version.py`` file with all the package information
+
+        * ``__module_type__`` will be used to complete the keywords in PyPI and as the sub-directory to store the pack's files
+        * the file docstring will be used as the package description in PyPI
+
+    * update the ``setup.py`` file (**not recommended**)
+
+        * ``setup.py`` should not be modified for most of the modules ... if necessary, do it with much care!
+
+And that's it!
+
+Then, to build and make your module available to the community, you must use the standard Python setuptools:
+
+    * run ``setup.py register`` to register the new package near PyPI
+    * run ``setup.py sdist`` to build the package
+    * run ``setup.py develop`` to make the package installed locally (development mode)
+    * run ``setup.py develop --uninstall`` to remove the development mode
+    * run ``setup.py install --dry-run`` to test the package installation (checks which and where the files are installed)
+
+When your package is ready and functional:
+
+    * run ``setup.py sdist upload`` to upload the package to `PyPI repository`_.
+
+**Note**: every time you upload a package to PyPI you will need to change the module version in the ``alignak_module_EXAMPLE2/__init.py__`` file.
+
+
+Installation
+------------
+
+From PyPI
+~~~~~~~~~
+To install the module from PyPI:
+::
+
+    pip install alignak-module-EXAMPLE
+
+
+From source files
+~~~~~~~~~~~~~~~~~
+To install the module from the source files:
+::
+
+    git clone https://github.com/Alignak-monitoring-contrib/alignak-module-EXAMPLE
+    cd alignak-module-EXAMPLE
+    pip install -r requirements
+    python setup.py install
+
+
+Configuration
+-------------
+
+Once installed, this module has its own configuration file in the */usr/local/etc/alignak/arbiter/modules* directory.
+The default configuration file is *mod-example.cfg*. This file is commented to help configure all the parameters.
+
+To configure an Alignak daemon to use this module:
+
+    - edit your daemon configuration file
+    - add the `module_alias` parameter value (`logs`) to the `modules` parameter of the daemon
+
+To set up several instances of the same module:
+
+    - copy the default configuration to another file,
+    - change the module alias parameter (`example_bis`)
+    - edit your daemon configuration file
+    - add the new `module_alias` parameter value (`example_bis`) to the `modules` parameter of the daemon
+
+
+Bugs, issues and contributing
+-----------------------------
+
+Please report any issue using the project `GitHub repository: <https://github.com/Alignak-monitoring-contrib/alignak-module-example/issues>`_.
+
+License
+-------
+
+Alignak Module EXAMPLE is available under the `GPL version 3 license`_.
+
+.. _GPL version 3 license: http://opensource.org/licenses/GPL-3.0
+.. _Alignak monitoring contrib: https://github.com/Alignak-monitoring-contrib
+.. _PyPI repository: <https://pypi.python.org/pypi>
