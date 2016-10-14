@@ -36,6 +36,8 @@ Thumbs.db
 test/tmp/*dat
 env/
 
+.idea
+
 # Documentation #
 #################
 docs/build

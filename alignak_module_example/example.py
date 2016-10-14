@@ -74,8 +74,10 @@ class Example(BaseModule):
         BaseModule.__init__(self, mod_conf)
 
         global logger
+        # Update the logger to include the module alias in the logger name
         logger = logging.getLogger('alignak.module.%s' % self.alias)
 
+        # Dump module inner properties and received configuration in the log
         logger.debug("inner properties: %s", self.__dict__)
         logger.debug("received configuration: %s", mod_conf.__dict__)
 
@@ -85,8 +87,15 @@ class Example(BaseModule):
         self.option_3 = getattr(mod_conf, 'option_3', None)
 
     def init(self):
-        logger.info("Initialization of the dummy arbiter module")
-        pass
+        """
+        This function initializes the module instance. If False is returned, the modules manager
+        will peiodically retry an to initialize the module.
+        If an exception is raised, the module will be definitely considered as dead :/
+
+        :return: True if initialization is ok, else False
+        """
+        logger.info("Initialization of the example module")
+        return True
 
     # Common functions
     def do_loop_turn(self):
@@ -117,7 +126,23 @@ class Example(BaseModule):
         This is usefull when your module import object from external database
         """
         logger.info("Ask me for objects to return")
-        return []
+
+        r = {'hosts': []}
+
+        h = {
+            'name': 'dummy host from dummy arbiter module',
+            'register': '0',
+        }
+        r['hosts'].append(h)
+
+        r['hosts'].append({
+            'host_name': "module_host_1",
+            'use': 'linux-server',
+            'address': 'localhost'
+        })
+
+        logger.info("Returning hosts objects to the Arbiter: %s", str(r))
+        return r
 
     def hook_early_configuration(self):
         """This function is called after getting all config objects"""
@@ -232,6 +257,10 @@ class Example(BaseModule):
         This module is an "external" module
         :return:
         """
+        global logger
+        # Update the logger to include the module alias in the logger name
+        logger = logging.getLogger('alignak.module.%s' % self.alias)
+
         # Set the OS process title
         self.set_proctitle(self.alias)
         self.set_exit_handler()

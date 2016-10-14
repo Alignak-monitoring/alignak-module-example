@@ -20,11 +20,38 @@ Build status (development release)
 Short description
 -----------------
 
-This module is an example skelleton to build Alignak modules ...
+This module is an example skeleton to build Alignak modules ...
 
 
 Packaging
 ---------
+
+Features and known issues
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Modules can be attached to an Alignak daemon thanks to the daemon configuration file. The module
+defines, in its own properties which daemon it may be attached to and the module documentation
+will informe the user about this.
+
+Rather than Shinken, a module cannot have sub-modules. This feature is not currenlty well tested
+and robust :)
+
+Modules types
+~~~~~~~~~~~~~
+
+Alignak attributes a type to each module that is installed. The idea behind the module type is
+that it is possible to have several existing modules for the same feature. The current modules types:
+
+    * retention, for a module that saves and reloads livestate data between each system restart
+    * livestate, for a module that will register the current system state (hosts, services states, ...)
+    * configuration, for a module that will provide the monitored objects to the Alignak arbiter
+    * passive, for a module that will collect passive checks results (NSCA, ...)
+    * logs, for a module that will collect monitoring logs
+    * action, for a module that will execute some actions (acknownledge, downtime, ...)
+
+Old Nagios parameters require that some external modules are installed for the corresponding
+features to be available. The Arbiter will alert if some features are activated and the
+corresponding modules are not available in the loaded monitoring configuration.
 
 Repositories
 ~~~~~~~~~~~~
@@ -79,7 +106,7 @@ To build a new module EXAMPLE2:
         * search and replace ``EXAMPLE`` with ``EXAMPLE2``
         * complete the **Documentation** chapter
 
-    * update the ``alignak_module_EXAMPLE2/version.py`` file with all the package information
+    * update the ``version.py`` file with all the package information
 
         * ``__module_type__`` will be used to complete the keywords in PyPI and as the sub-directory to store the pack's files
         * the file docstring will be used as the package description in PyPI
@@ -136,12 +163,12 @@ The default configuration file is *mod-example.cfg*. This file is commented to h
 To configure an Alignak daemon to use this module:
 
     - edit your daemon configuration file
-    - add the `module_alias` parameter value (`logs`) to the `modules` parameter of the daemon
+    - add your module alias value (`example`) to the `modules` parameter of the daemon
 
 To set up several instances of the same module:
 
     - copy the default configuration to another file,
-    - change the module alias parameter (`example_bis`)
+    - update the module alias parameter (`example_bis`)
     - edit your daemon configuration file
     - add the new `module_alias` parameter value (`example_bis`) to the `modules` parameter of the daemon
 
