@@ -20,8 +20,8 @@ try:
     python_version = sys.version_info
 except:
     python_version = (1, 5)
-if python_version < (2, 7):
-    sys.exit("This application requires a minimum Python 2.7.x, sorry!")
+if python_version < (2, 6):
+    sys.exit("This application requires a minimum Python 2.6.x, sorry!")
 elif python_version >= (3,):
     sys.exit("This application is not yet compatible with Python 3.x, sorry!")
 
