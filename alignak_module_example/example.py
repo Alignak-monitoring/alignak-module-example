@@ -249,37 +249,41 @@ class Example(BaseModule):
     def manage_update_service_status_brok(self, brok):
         pass
 
-    # main is the main loop of the module if it is an external module
-    def main(self):
-        """
-        Main loop of the process
-
-        This module is an "external" module
-        :return:
-        """
-        global logger
-        # Update the logger to include the module alias in the logger name
-        logger = logging.getLogger('alignak.module.%s' % self.alias)
-
-        # Set the OS process title
-        self.set_proctitle(self.alias)
-        self.set_exit_handler()
-
-        logger.info("starting...")
-
-        while not self.interrupted:
-            logger.debug("queue length: %s", self.to_q.qsize())
-            start = time.time()
-
-            # Get message in the queue
-            l = self.to_q.get()
-            for b in l:
-                # Prepare and manage each brok in the queue message
-                b.prepare()
-                self.manage_brok(b)
-
-            logger.debug("time to manage %s broks (%d secs)", len(l), time.time() - start)
-
-        logger.info("stopping...")
-
-        logger.info("stopped")
+    # ----------------------------------
+    # !!! WARNING!!! This function MUST remain commented because this example module is used
+    # in the Alignak unit tests. If the function is uncommented, it will break the unit tests !!!
+    # ----------------------------------
+    # # main is the main loop of the module if it is an external module
+    # def main(self):
+    #     """
+    #     Main loop of the process
+    #
+    #     This module is an "external" module
+    #     :return:
+    #     """
+    #     global logger
+    #     # Update the logger to include the module alias in the logger name
+    #     logger = logging.getLogger('alignak.module.%s' % self.alias)
+    #
+    #     # Set the OS process title
+    #     self.set_proctitle(self.alias)
+    #     self.set_exit_handler()
+    #
+    #     logger.info("starting...")
+    #
+    #     while not self.interrupted:
+    #         logger.debug("queue length: %s", self.to_q.qsize())
+    #         start = time.time()
+    #
+    #         # Get message in the queue
+    #         l = self.to_q.get()
+    #         for b in l:
+    #             # Prepare and manage each brok in the queue message
+    #             b.prepare()
+    #             self.manage_brok(b)
+    #
+    #         logger.debug("time to manage %s broks (%d secs)", len(l), time.time() - start)
+    #
+    #     logger.info("stopping...")
+    #
+    #     logger.info("stopped")
