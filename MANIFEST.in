@@ -1,5 +1,6 @@
 include version.py
 include README.rst
 include LICENSE
+include AUTHORS
 include requirements.txt
-recursive-include alignak_module_log *
+recursive-include alignak_module_example *

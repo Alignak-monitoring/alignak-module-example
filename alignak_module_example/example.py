@@ -23,10 +23,9 @@ This module is an Alignak Broker module that collects the `monitoring_log` broks
 them to a Python logger configured in the module configuration file
 """
 
-import os
-import json
 import time
 import logging
+import inspect
 
 from alignak.basemodule import BaseModule
 
@@ -82,22 +81,29 @@ class Example(BaseModule):
         logger.debug("received configuration: %s", mod_conf.__dict__)
 
         # Options are the variables defined in the module configuration file
-        self.option_1 = getattr(mod_conf, 'option_1', None)
-        self.option_2 = getattr(mod_conf, 'option_2', None)
-        self.option_3 = getattr(mod_conf, 'option_3', None)
+        self.option_1 = getattr(mod_conf, 'option1', None)
+        self.option_2 = getattr(mod_conf, 'option2', None)
+        self.option_3 = getattr(mod_conf, 'option3', None)
+        logger.info("configuration, %s, %s, %s", self.option_1, self.option_2, self.option_3)
 
     def init(self):
         """
         This function initializes the module instance. If False is returned, the modules manager
-        will peiodically retry an to initialize the module.
+        will periodically retry an to initialize the module.
         If an exception is raised, the module will be definitely considered as dead :/
+
+        This function must be present and return True for Alignak to consider the module as loaded
+        and fully functional.
 
         :return: True if initialization is ok, else False
         """
+        logger.info("Test - Example in %s", inspect.stack()[0][3])
         logger.info("Initialization of the example module")
         return True
 
+    # ----------
     # Common functions
+    # ----------
     def do_loop_turn(self):
         """This function is called/used when you need a module with
         a loop function (and use the parameter 'external': True)
@@ -105,19 +111,25 @@ class Example(BaseModule):
         logger.info("In loop")
         time.sleep(1)
 
-    def hook_tick(self):
+    def hook_tick(self, daemon):
         """This function is called on each daemon 'tick'"""
-        logger.info("In hook tick")
+        logger.info("Test - Example in %s for daemon: %s", inspect.stack()[0][3], daemon)
 
-    # Arbiter specific functions
-    ## In execution order
-    def hook_load_retention(self):
-        """This function is called after retention loading"""
-        logger.info("In hook load retention")
+    # Redefined in scheduler
+    # def hook_save_retention(self):
+    #     """This function is called to save data - really useful?"""
+    #     logger.info("Test - Example in %s", inspect.stack()[0][3])
+    #
+    # def hook_load_retention(self):
+    #     """This function is called to restore data - really useful?"""
+    #     logger.info("Test - Example in %s", inspect.stack()[0][3])
 
-    def hook_read_configuration(self):
+    # ----------
+    # Arbiter specific functions (In execution order)
+    # ----------
+    def hook_read_configuration(self, daemon):
         """This function is called after conf file reading"""
-        logger.info("In hook read config")
+        logger.info("Test - Example in %s for daemon: %s", inspect.stack()[0][3], daemon)
 
     def get_objects(self):
         """This function must return a list of config
@@ -125,7 +137,7 @@ class Example(BaseModule):
 
         This is usefull when your module import object from external database
         """
-        logger.info("Ask me for objects to return")
+        logger.info("Test - Example in %s", inspect.stack()[0][3])
 
         r = {'hosts': []}
 
@@ -137,115 +149,151 @@ class Example(BaseModule):
 
         r['hosts'].append({
             'host_name': "module_host_1",
-            'use': 'linux-server',
             'address': 'localhost'
         })
 
         logger.info("Returning hosts objects to the Arbiter: %s", str(r))
         return r
 
-    def hook_early_configuration(self):
+    def hook_early_configuration(self, daemon):
         """This function is called after getting all config objects"""
-        logger.info("In hook early config")
+        logger.info("Test - Example in %s for daemon: %s", inspect.stack()[0][3], daemon)
 
-    def hook_late_configuration(self, conf):
+    def hook_late_configuration(self, daemon):
         """This function is called after configuration compilation
         This the last step of configuration reading
         """
-        logger.info("In hook late config")
+        logger.info("Test - Example in %s for daemon: %s", inspect.stack()[0][3], daemon)
 
-
+    # ----------
     # scheduler only module
-    def update_retention_objects(self):
-        pass
-    def load_retention_objects(self):
-        pass
-    def hook_save_retention(self, scheduler):
-        logger.info("Dummy in save retention")
-    def hook_load_retention(self, scheduler):
-        logger.info("Dummy in load retention")
-    def hook_get_new_actions(self, scheduler):
-        logger.info("Dummy in get new actions")
-    def hook_pre_scheduler_mod_start(self, scheduler):
-        logger.info("Dummy in hook pre-scheduler")
-    def hook_scheduler_tick(self, scheduler):
-        logger.info("Dummy in hook scheduler tick")
-    def hook_tick(self, scheduler):
-        logger.info("Dummy in hook tick")
-    def do_loop_turn(self, scheduler):
-        logger.info("Dummy in loop turn")
-        time.sleep(0.1)
+    # ----------
+    def update_retention_objects(self, daemon):
+        """ Update retention date """
+        logger.info("Test - Example in %s for daemon: %s", inspect.stack()[0][3], daemon)
 
+    def load_retention_objects(self, daemon):
+        """ Self daemon objects retention - avoid using this! """
+        logger.info("Test - Example in %s for daemon: %s", inspect.stack()[0][3], daemon)
 
+    def hook_load_retention(self, daemon):
+        """This function is called by the daemon to restore the objects live state """
+        logger.info("Test - Example in %s for daemon: %s", inspect.stack()[0][3], daemon)
+
+    def hook_save_retention(self, daemon):
+        """This function is called before daemon exit to save the objects live state """
+        logger.info("Test - Example in %s for daemon: %s", inspect.stack()[0][3], daemon)
+
+    def hook_get_new_actions(self, daemon):
+        logger.info("Test - Example in %s for daemon: %s", inspect.stack()[0][3], daemon)
+
+    def hook_pre_scheduler_mod_start(self, daemon):
+        logger.info("Test - Example in %s for daemon: %s", inspect.stack()[0][3], daemon)
+
+    def hook_scheduler_tick(self, daemon):
+        logger.info("Test - Example in %s for daemon: %s", inspect.stack()[0][3], daemon)
+
+    # Already defined
+    # def hook_tick(self, daemon):
+    #     logger.info("Test - Example in %s for daemon: %s", inspect.stack()[0][3], daemon)
+
+    # Already defined
+    # def do_loop_turn(self, daemon):
+    #     logger.info("Test - Example in %s for daemon: %s", inspect.stack()[0][3], daemon)
+
+    # ----------
     # Broker only module
-    def load_retention(self):
-        logger.info("Dummy in load retention")
-    def hook_tick(self):
-        logger.info("Dummy in hook tick")
-    def main(self):
-        pass
-    def hook_pre_scheduler_mod_start(self):
-        logger.info("Dummy in hook pre-scheduler")
-    def do_loop_turn(self):
-        logger.info("Dummy in loop turn")
-        time.sleep(0.1)
+    # ----------
+    # Already defined
+    # def hook_tick(self):
+    #     logger.info("Test - Example in %s for daemon: %s", inspect.stack()[0][3], daemon)
 
-    ## managing all broks
+    # Already defined
+    # def do_loop_turn(self, daemon):
+    #     logger.info("Test - Example in %s for daemon: %s", inspect.stack()[0][3], daemon)
+
+    # managing all broks
     def manage_brok(self, brok):
+        """ This function is called as soon as a brok is received """
+        logger.info("Test - Example in %s, got brok type: %s", inspect.stack()[0][3], brok.type)
+
+    """
+        Broks types:
+        - log
+        - monitoring_log
+
+        - notification_raise
+        - downtime_raise
+        - initial_host_status, initial_service_status, initial_contact_status
+        - initial_broks_done
+
+        - update_host_status, update_service_status, initial_contact_status
+        - host_check_result, service_check_result
+        - host_next_schedule, service_next_scheduler
+        - host_snapshot, service_snapshot
+        - unknown_host_check_result, unknown_service_check_result
+
+        - program_status
+        - clean_all_my_instance_id
+
+        - new_conf
+    """
+    # managing one specific type type of brok
+    def manage_log_brok(self, brok):
+        """Deprecated ..."""
         pass
 
-    brok_types = [
-        "arbiter", "brok", "broker", "businessimpactmodulation",
-        "check", "checkmodulation", "CommandCall", "contact",
-        "contactgroup", "escalation", "eventhandler",
-        "externalcommand", "host", "hostdependency",
-        "hostescalation", "hostextinfo", "hostgroup",
-        "macromodulation", "macroresolver", "message", "module",
-        "notification", "notificationway", "command", "config",
-        "servicedependency", "pack", "poller", "reactionner",
-        "realm", "receiver", "resultmodulation", "scheduler",
-        "service", "serviceescalation", "serviceextinfo",
-        "servicegroup", "timeperiod", "trigger",
-    ]
+    def manage_monitoring_log_brok(self, brok):
+        pass
 
-    ## managing one type of brok
     def manage_clean_all_my_instance_id_brok(self, brok):
         pass
+
     def manage_downtime_raise_brok(self, brok):
         pass
+
     def manage_initial_broks_done_brok(self, brok):
         pass
+
     def manage_notification_raise_brok(self, brok):
         pass
+
     def manage_program_status_brok(self, brok):
         pass
-    def  manage_unknown_host_check_result_brok(self, broker):
+
+    def manage_unknown_host_check_result_brok(self, brok):
         pass
-    def  manage_unknown_service_check_result_brok(self, broker):
+
+    def manage_unknown_service_check_result_brok(self, brok):
         pass
 
     def manage_initial_host_status_brok(self, brok):
         pass
+
     def manage_initial_service_status_brok(self, brok):
         pass
 
     def manage_host_check_result_brok(self, brok):
         pass
+
     def manage_service_check_result_brok(self, brok):
         pass
 
     def manage_host_next_schedule_brok(self, brok):
         pass
+
     def manage_service_next_schedule_brok(self, brok):
         pass
 
     def manage_host_snapshot_brok(self, brok):
         pass
+
     def manage_service_snapshot_brok(self, brok):
         pass
 
     def manage_update_host_status_brok(self, brok):
         pass
+
     def manage_update_service_status_brok(self, brok):
         pass
 

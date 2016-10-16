@@ -13,8 +13,8 @@ Build status (stable release)
 Build status (development release)
 ----------------------------------
 
-.. image:: https://travis-ci.org/Alignak-monitoring-contrib/alignak-module-example.svg?branch=develop
-    :target: https://travis-ci.org/Alignak-monitoring-contrib/alignak-module-example
+.. image:: https://travis-ci.org/Alignak-monitoring/alignak-module-example.svg?branch=develop
+    :target: https://travis-ci.org/Alignak-monitoring/alignak-module-example
 
 
 Short description
@@ -48,6 +48,7 @@ that it is possible to have several existing modules for the same feature. The c
     * passive, for a module that will collect passive checks results (NSCA, ...)
     * logs, for a module that will collect monitoring logs
     * action, for a module that will execute some actions (acknownledge, downtime, ...)
+    * poller, for a module that will execute checks in a poller
 
 Old Nagios parameters require that some external modules are installed for the corresponding
 features to be available. The Arbiter will alert if some features are activated and the
@@ -61,8 +62,7 @@ All Alignak modules are stored in their own repository in the `Alignak monitorin
 
 Repository example
 ~~~~~~~~~~~~~~~~~~
-Repository directories and files example:
-::
+Repository directories and files example::
 
     README.rst
     LICENCE
@@ -137,16 +137,14 @@ Installation
 
 From PyPI
 ~~~~~~~~~
-To install the module from PyPI:
-::
+To install the module from PyPI::
 
     pip install alignak-module-EXAMPLE
 
 
 From source files
 ~~~~~~~~~~~~~~~~~
-To install the module from the source files:
-::
+To install the module from the source files::
 
     git clone https://github.com/Alignak-monitoring-contrib/alignak-module-EXAMPLE
     cd alignak-module-EXAMPLE
@@ -176,7 +174,7 @@ To set up several instances of the same module:
 Bugs, issues and contributing
 -----------------------------
 
-Please report any issue using the project `GitHub repository: <https://github.com/Alignak-monitoring-contrib/alignak-module-example/issues>`_.
+Please report any issue using the project `GitHub repository: <https://github.com/Alignak-monitoring/alignak-module-example/issues>`_.
 
 License
 -------

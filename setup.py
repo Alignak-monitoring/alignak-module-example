@@ -61,7 +61,7 @@ if not alignak_cfg:
 
 # Build list of all installable package files
 (data_files, to_be_parsed_files, to_be_installed_files) = get_files(
-    alignak_cfg, manifest["__pkg_name__"], manifest["__module_type__"], module=True
+    alignak_cfg, manifest["__pkg_name__"], manifest["__module_types__"], module=True
 )
 
 setup(
@@ -71,7 +71,7 @@ setup(
     # Metadata for PyPI
     author=manifest["__author__"],
     author_email=manifest["__author_email__"],
-    keywords="alignak monitoring module " + manifest["__module_type__"],
+    keywords="alignak monitoring module " + manifest["__module_types__"],
     url=manifest["__url__"],
     license=manifest["__license__"],
     description=manifest["__description__"],
