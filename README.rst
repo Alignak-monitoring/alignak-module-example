@@ -8,13 +8,28 @@ Build status (stable release)
 
 .. image:: https://travis-ci.org/Alignak-monitoring/alignak-module-example.svg?branch=master
     :target: https://travis-ci.org/Alignak-monitoring/alignak-module-example
+    :alt: Unit tests
 
+.. image:: https://coveralls.io/repos/Alignak-monitoring-contrib/alignak-module-example/badge.svg?branch=master&service=github
+    :target: https://coveralls.io/github/Alignak-monitoring-contrib/alignak-module-example?branch=master
+    :alt: Code coverage
 
 Build status (development release)
 ----------------------------------
 
 .. image:: https://travis-ci.org/Alignak-monitoring/alignak-module-example.svg?branch=develop
     :target: https://travis-ci.org/Alignak-monitoring/alignak-module-example
+    :alt: Unit tests
+
+.. image:: https://coveralls.io/repos/Alignak-monitoring-contrib/alignak-module-example/badge.svg?branch=develop&service=github
+    :target: https://coveralls.io/github/Alignak-monitoring-contrib/alignak-module-example?branch=master
+    :alt: Code coverage
+
+Most recent release
+-------------------
+
+.. image:: https://badge.fury.io/py/alignak_module_example.svg
+    :target: https://badge.fury.io/py/alignak_module_example
 
 
 Short description
