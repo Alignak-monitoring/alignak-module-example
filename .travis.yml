@@ -1,0 +1,38 @@
+language: python
+sudo: true
+python:
+  - "2.7"
+  # - "3.4"
+
+# command to install dependencies
+# some are only used for travis/coveralls so we are installing them here only
+install:
+  - ./test/setup_test.sh
+
+# command to run tests
+script:
+  # so to help eventual debug: knowing what exact versions are in use can be rather useful.
+  - pip freeze
+  # Code static analysis
+  # Not for the example module !
+  # - pep8 --max-line-length=100 --exclude='*.pyc, *.cfg, *.log' --ignore='E402' alignak_module_ws/*
+  # - pylint --rcfile=.pylintrc alignak_module_ws/
+  # Code dynamic analysis
+  - cd test
+  # Delete previously existing coverage results
+  - coverage erase
+  # Run test suite with py.test running its coverage plugin
+  - pytest --cov=alignak_module_example --cov-config .coveragerc test_*.py
+  # Report about coverage
+  - coverage report -m
+  - cd ..
+
+
+# specific call to launch coverage data into coveralls.io
+after_success:
+  # to get coverage data with relative paths and not absolute we have to
+  # execute coveralls from the base directory of the project,
+  # so we need to move the .coverage file here :
+  # mv test/.coverage . && coveralls --rcfile=test/.coveragerc -v
+  mv test/.coverage . && coveralls -v
+

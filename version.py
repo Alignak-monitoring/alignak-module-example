@@ -9,13 +9,13 @@ __pkg_name__ = u"alignak_module_EXAMPLE"
 # Module type for PyPI keywords
 # Used for:
 # - PyPI keywords
-__module_type__ = u"broker"
+__module_types__ = u"example"
 
 # Application manifest
-__version__ = u"0.2.0"
+__version__ = u"0.2.1"
 __author__ = u"Alignak team"
 __author_email__ = u"frederic.mohier@gmail.com"
 __copyright__ = u"(c) 2015-2016 - %s" % __author__
 __license__ = u"GNU Affero General Public License, version 3"
-__url__ = u"https://github.com/Alignak-monitoring-contrib/alignak-module-EXAMPLE"
-__description__ = u"Alignak - Broker module for ...."
+__url__ = u"https://github.com/Alignak-monitoring/alignak-module-example"
+__description__ = u"Alignak - Alignak module as an example to build other modules"

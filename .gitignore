@@ -43,9 +43,11 @@ docs/tools/media/
 docs/tools/pages/
 
 
-# test and coverage
-test/tmp/.cov*
+# pycharm
+.idea/*
 
+# test and coverage
+test/.coverage
 
 # Pbr
 pbr-*.egg/
