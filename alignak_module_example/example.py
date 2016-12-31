@@ -212,6 +212,15 @@ class Example(BaseModule):
     # def do_loop_turn(self, daemon):
     #     logger.info("Test - Example in %s for daemon: %s", inspect.stack()[0][3], daemon)
 
+    def want_brok(self, brok):
+        """ This function is called to check if a module wants a specific type of brok
+        Default is to return True to get all broks
+
+        Only implement this function if it is necessary!
+        """
+        logger.info("Test - Example in %s, want brok type: %s", inspect.stack()[0][3], brok.type)
+        return True
+
     # managing all broks
     def manage_brok(self, brok):
         """ This function is called as soon as a brok is received """
@@ -219,7 +228,6 @@ class Example(BaseModule):
 
     """
         Broks types:
-        - log
         - monitoring_log
 
         - notification_raise
@@ -241,60 +249,97 @@ class Example(BaseModule):
     # managing one specific type type of brok
     def manage_log_brok(self, brok):
         """Deprecated ..."""
+        logger.error("Deprecated function (%s) for module example", inspect.stack()[0][3])
         pass
 
     def manage_monitoring_log_brok(self, brok):
+        """Deprecated ..."""
+        logger.error("Deprecated function (%s) for module example", inspect.stack()[0][3])
         pass
 
     def manage_clean_all_my_instance_id_brok(self, brok):
+        """Deprecated ..."""
+        logger.error("Deprecated function (%s) for module example", inspect.stack()[0][3])
         pass
 
     def manage_downtime_raise_brok(self, brok):
+        """Deprecated ..."""
+        logger.error("Deprecated function (%s) for module example", inspect.stack()[0][3])
         pass
 
     def manage_initial_broks_done_brok(self, brok):
+        """Deprecated ..."""
+        logger.error("Deprecated function (%s) for module example", inspect.stack()[0][3])
         pass
 
     def manage_notification_raise_brok(self, brok):
+        """Deprecated ..."""
+        logger.error("Deprecated function (%s) for module example", inspect.stack()[0][3])
         pass
 
     def manage_program_status_brok(self, brok):
+        """Deprecated ..."""
+        logger.error("Deprecated function (%s) for module example", inspect.stack()[0][3])
         pass
 
     def manage_unknown_host_check_result_brok(self, brok):
+        """Deprecated ..."""
+        logger.error("Deprecated function (%s) for module example", inspect.stack()[0][3])
         pass
 
     def manage_unknown_service_check_result_brok(self, brok):
+        """Deprecated ..."""
+        logger.error("Deprecated function (%s) for module example", inspect.stack()[0][3])
         pass
 
     def manage_initial_host_status_brok(self, brok):
+        """Deprecated ..."""
+        logger.error("Deprecated function (%s) for module example", inspect.stack()[0][3])
         pass
 
     def manage_initial_service_status_brok(self, brok):
+        """Deprecated ..."""
+        logger.error("Deprecated function (%s) for module example", inspect.stack()[0][3])
         pass
 
     def manage_host_check_result_brok(self, brok):
+        """Deprecated ..."""
+        logger.error("Deprecated function (%s) for module example", inspect.stack()[0][3])
         pass
 
     def manage_service_check_result_brok(self, brok):
+        """Deprecated ..."""
+        logger.error("Deprecated function (%s) for module example", inspect.stack()[0][3])
         pass
 
     def manage_host_next_schedule_brok(self, brok):
+        """Deprecated ..."""
+        logger.error("Deprecated function (%s) for module example", inspect.stack()[0][3])
         pass
 
     def manage_service_next_schedule_brok(self, brok):
+        """Deprecated ..."""
+        logger.error("Deprecated function (%s) for module example", inspect.stack()[0][3])
         pass
 
     def manage_host_snapshot_brok(self, brok):
+        """Deprecated ..."""
+        logger.error("Deprecated function (%s) for module example", inspect.stack()[0][3])
         pass
 
     def manage_service_snapshot_brok(self, brok):
+        """Deprecated ..."""
+        logger.error("Deprecated function (%s) for module example", inspect.stack()[0][3])
         pass
 
     def manage_update_host_status_brok(self, brok):
+        """Deprecated ..."""
+        logger.error("Deprecated function (%s) for module example", inspect.stack()[0][3])
         pass
 
     def manage_update_service_status_brok(self, brok):
+        """Deprecated ..."""
+        logger.error("Deprecated function (%s) for module example", inspect.stack()[0][3])
         pass
 
     # main is the main loop of the module if it is an external module
@@ -320,11 +365,16 @@ class Example(BaseModule):
             start = time.time()
 
             # Get message in the queue
-            l = self.to_q.get()
-            for b in l:
-                # Prepare and manage each brok in the queue message
-                b.prepare()
-                self.manage_brok(b)
+            try:
+                l = self.to_q.get()
+            except Exception as exp:
+                print("Queue get failed: %s", str(exp))
+                continue
+            else:
+                for b in l:
+                    # Prepare and manage each brok in the queue message
+                    b.prepare()
+                    self.manage_brok(b)
 
             logger.debug("time to manage %s broks (%d secs)", len(l), time.time() - start)
 

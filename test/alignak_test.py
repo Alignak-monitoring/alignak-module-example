@@ -18,9 +18,9 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with Alignak.  If not, see <http://www.gnu.org/licenses/>.
 
-#
-# This file is used to test host- and service-downtimes.
-#
+"""
+    This file contains classes and utilities for Alignak tests modules
+"""
 
 import sys
 from sys import __stdout__
@@ -53,6 +53,7 @@ from alignak.macroresolver import MacroResolver
 from alignak.external_command import ExternalCommandManager, ExternalCommand
 from alignak.check import Check
 from alignak.message import Message
+from alignak.misc.serialization import serialize, unserialize
 from alignak.objects.arbiterlink import ArbiterLink
 from alignak.objects.schedulerlink import SchedulerLink
 from alignak.objects.pollerlink import PollerLink
@@ -152,6 +153,36 @@ class AlignakTest(unittest.TestCase):
         def assertRegex(self, *args, **kwargs):
             return self.assertRegexpMatches(*args, **kwargs)
 
+    def setup_logger(self):
+        """
+        Setup a log collector
+        :return:
+        """
+        self.logger = logging.getLogger("alignak")
+
+        # Add collector for test purpose.
+        collector_h = CollectorHandler()
+        collector_h.setFormatter(DEFAULT_FORMATTER_NAMED)
+        self.logger.addHandler(collector_h)
+
+    def files_update(self, files, replacements):
+        """Update files content with the defined replacements
+
+        :param files: list of files to parse and replace
+        :param replacements: list of values to replace
+        :return:
+        """
+        for filename in files:
+            lines = []
+            with open(filename) as infile:
+                for line in infile:
+                    for src, target in replacements.iteritems():
+                        line = line.replace(src, target)
+                    lines.append(line)
+            with open(filename, 'w') as outfile:
+                for line in lines:
+                    outfile.write(line)
+
     def setup_with_file(self, configuration_file):
         """
         Load alignak with defined configuration file
@@ -179,12 +210,9 @@ class AlignakTest(unittest.TestCase):
         self.conf_is_correct = False
         self.configuration_warnings = []
         self.configuration_errors = []
-        self.logger = logging.getLogger("alignak")
 
         # Add collector for test purpose.
-        collector_h = CollectorHandler()
-        collector_h.setFormatter(DEFAULT_FORMATTER_NAMED)
-        self.logger.addHandler(collector_h)
+        self.setup_logger()
 
         # Initialize the Arbiter with no daemon configuration file
         self.arbiter = Arbiter(None, [configuration_file], False, False, False, False,
@@ -230,7 +258,7 @@ class AlignakTest(unittest.TestCase):
         # Build schedulers dictionary with the schedulers involved in the configuration
         for scheduler in self.arbiter.dispatcher.schedulers:
             sched = Alignak([], False, False, True, '/tmp/scheduler.log')
-            sched.load_modules_manager()
+            sched.load_modules_manager(scheduler.name)
             sched.new_conf = scheduler.conf_package
             if sched.new_conf:
                 sched.setup_new_conf()
@@ -252,9 +280,6 @@ class AlignakTest(unittest.TestCase):
         for broker in self.arbiter.dispatcher.brokers:
             self.brokers[broker.broker_name] = broker
 
-        # No current need of such a dictionary for the other daemons types...
-        # but it may be easiy completed!
-
     def add(self, b):
         if isinstance(b, Brok):
             self.broks[b.uuid] = b
@@ -263,19 +288,28 @@ class AlignakTest(unittest.TestCase):
             self.schedulers['scheduler-master'].run_external_command(b.cmd_line)
 
     def fake_check(self, ref, exit_status, output="OK"):
-        # print "fake", ref
-        now = time.time()
-        check = ref.schedule(self.schedulers['scheduler-master'].sched.hosts, self.schedulers['scheduler-master'].sched.services, self.schedulers['scheduler-master'].sched.timeperiods,
-                             self.schedulers['scheduler-master'].sched.macromodulations, self.schedulers['scheduler-master'].sched.checkmodulations,
-                             self.schedulers['scheduler-master'].sched.checks, force=True)
-        # now checks are schedule and we get them in
-        # the action queue
-        # check = ref.actions.pop()
-        self.schedulers['scheduler-master'].sched.add(check)  # check is now in sched.checks[]
-        # check = self.schedulers['scheduler-master'].sched.checks[ref.checks_in_progress[0]]
+        """
+        Simulate a check execution and result
+        :param ref: host/service concerned by the check
+        :param exit_status: check exit status code (0, 1, ...).
+               If set to None, the check is simply scheduled but not "executed"
+        :param output: check output (output + perf data)
+        :return:
+        """
 
-        # Allows to force check scheduling without setting its status nor
-        # output. Useful for manual business rules rescheduling, for instance.
+        now = time.time()
+        check = ref.schedule(self.schedulers['scheduler-master'].sched.hosts,
+                             self.schedulers['scheduler-master'].sched.services,
+                             self.schedulers['scheduler-master'].sched.timeperiods,
+                             self.schedulers['scheduler-master'].sched.macromodulations,
+                             self.schedulers['scheduler-master'].sched.checkmodulations,
+                             self.schedulers['scheduler-master'].sched.checks,
+                             force=True, force_time=None)
+        # now the check is scheduled and we get it in the action queue
+        self.schedulers['scheduler-master'].sched.add(check)  # check is now in sched.checks[]
+
+        # Allows to force check scheduling without setting its status nor output.
+        # Useful for manual business rules rescheduling, for instance.
         if exit_status is None:
             return
 
@@ -288,10 +322,13 @@ class AlignakTest(unittest.TestCase):
         # is a valid value in the future
         ref.next_chk = now - 0.5
 
-        check.get_outputs(output, 9000)
+        # Max plugin output is default to 8192
+        check.get_outputs(output, 8192)
         check.exit_status = exit_status
         check.execution_time = 0.001
         check.status = 'waitconsume'
+
+        # Put the check result in the waiting results for the scheduler ...
         self.schedulers['scheduler-master'].sched.waiting_results.put(check)
 
     def scheduler_loop(self, count, items, mysched=None):
@@ -325,6 +362,9 @@ class AlignakTest(unittest.TestCase):
                 self.assertGreater(len(obj.checks_in_progress), 0)
                 chk = mysched.sched.checks[obj.checks_in_progress[0]]
                 chk.set_type_active()
+                chk.check_time = time.time()
+                chk.wait_time = 0.0001
+                chk.last_poll = chk.check_time
                 chk.output = output
                 chk.exit_status = exit_status
                 mysched.sched.waiting_results.put(chk)
@@ -337,6 +377,8 @@ class AlignakTest(unittest.TestCase):
     def external_command_loop(self):
         """
         Execute the scheduler actions for external commands.
+
+        Yes, why not, but the scheduler si not an ECM 'dispatcher' but an 'applyer' ...
 
         @verified
         :return:
@@ -352,12 +394,8 @@ class AlignakTest(unittest.TestCase):
         self.schedulers['scheduler-master'].sched.delete_zombie_actions()
         checks = self.schedulers['scheduler-master'].sched.get_to_run_checks(True, False, worker_name='tester')
         actions = self.schedulers['scheduler-master'].sched.get_to_run_checks(False, True, worker_name='tester')
-        # print "------------ worker loop checks ----------------"
-        # print checks
-        # print "------------ worker loop actions ----------------"
         if verbose is True:
             self.show_actions()
-        # print "------------ worker loop new ----------------"
         for a in actions:
             a.status = 'inpoller'
             a.check_time = time.time()
@@ -365,7 +403,27 @@ class AlignakTest(unittest.TestCase):
             self.schedulers['scheduler-master'].sched.put_results(a)
         if verbose is True:
             self.show_actions()
-        # print "------------ worker loop end ----------------"
+
+    def launch_internal_check(self, svc_br):
+        """ Launch an internal check for the business rule service provided """
+        self._sched = self.schedulers['scheduler-master'].sched
+
+        # Launch an internal check
+        now = time.time()
+        self._sched.add(svc_br.launch_check(now - 1, self._sched.hosts, self._sched.services,
+                                            self._sched.timeperiods, self._sched.macromodulations,
+                                            self._sched.checkmodulations, self._sched.checks))
+        c = svc_br.actions[0]
+        self.assertEqual(True, c.internal)
+        self.assertTrue(c.is_launchable(now))
+
+        # ask the scheduler to launch this check
+        # and ask 2 loops: one to launch the check
+        # and another to get the result
+        self.scheduler_loop(2, [])
+
+        # We should not have the check anymore
+        self.assertEqual(0, len(svc_br.actions))
 
     def show_logs(self, scheduler=False):
         """
@@ -388,11 +446,11 @@ class AlignakTest(unittest.TestCase):
         actions = sorted(self.schedulers['scheduler-master'].sched.actions.values(), key=lambda x: x.creation_time)
         for a in actions:
             if a.is_a == 'notification':
-                item = self.scheduler.sched.find_item_by_id(a.ref)
+                item = self.schedulers['scheduler-master'].sched.find_item_by_id(a.ref)
                 if item.my_type == "host":
                     ref = "host: %s" % item.get_name()
                 else:
-                    hst = self.scheduler.sched.find_item_by_id(item.host)
+                    hst = self.schedulers['scheduler-master'].sched.find_item_by_id(item.host)
                     ref = "host: %s svc: %s" % (hst.get_name(), item.get_name())
                 print "NOTIFICATION %s %s %s %s %s" % (a.uuid, ref, a.type,
                                                        time.asctime(time.localtime(a.t_to_go)),
@@ -407,8 +465,8 @@ class AlignakTest(unittest.TestCase):
         :return:
         """
         print "--- checks <<<--------------------------------"
-
-        for check in self.schedulers['scheduler-master'].sched.checks.values():
+        checks = sorted(self.schedulers['scheduler-master'].sched.checks.values(), key=lambda x: x.creation_time)
+        for check in checks:
             print("- %s" % check)
         print "--- checks >>>--------------------------------"
 
@@ -477,13 +535,14 @@ class AlignakTest(unittest.TestCase):
         :type number: int
         :return: None
         """
-        print("Actions: %s" % self.schedulers['scheduler-master'].sched.actions)
-        actions = sorted(self.schedulers['scheduler-master'].sched.actions.values(), key=lambda x: x.creation_time)
+        actions = sorted(self.schedulers['scheduler-master'].sched.actions.values(),
+                         key=lambda x: x.creation_time)
         self.assertEqual(number, len(self.schedulers['scheduler-master'].sched.actions),
                          "Not found expected number of actions:\nactions_logs=[[[\n%s\n]]]" %
-                         ('\n'.join('\t%s = creation: %s, is_a: %s, type: %s, status: %s, planned: %s, '
-                                    'command: %s' %
-                                    (idx, b.creation_time, b.is_a, b.type, b.status, b.t_to_go, b.command)
+                         ('\n'.join('\t%s = creation: %s, is_a: %s, type: %s, status: %s, '
+                                    'planned: %s, command: %s' %
+                                    (idx, b.creation_time, b.is_a, b.type,
+                                     b.status, b.t_to_go, b.command)
                                     for idx, b in enumerate(actions))))
 
     def assert_actions_match(self, index, pattern, field):
@@ -492,7 +551,8 @@ class AlignakTest(unittest.TestCase):
 
         @verified
 
-        :param index: index number of actions list
+        :param index: index in the actions list. If index is -1, all the actions in the list are
+        searched for a matching pattern
         :type index: int
         :param pattern: pattern to verify is in the action
         :type pattern: str
@@ -501,14 +561,26 @@ class AlignakTest(unittest.TestCase):
         :return: None
         """
         regex = re.compile(pattern)
-        actions = sorted(self.schedulers['scheduler-master'].sched.actions.values(), key=lambda x: x.creation_time)
-        myaction = actions[index]
-        self.assertTrue(regex.search(getattr(myaction, field)),
-                        "Not found a matching patternin actions:\nindex=%s field=%s pattern=%r\n"
-                        "action_line=creation: %s, is_a: %s, type: %s, status: %s, planned: %s, "
-                        "command: %s" % (
-                            index, field, pattern, myaction.creation_time, myaction.is_a,
-                            myaction.type, myaction.status, myaction.t_to_go, myaction.command))
+        actions = sorted(self.schedulers['scheduler-master'].sched.actions.values(),
+                         key=lambda x: x.creation_time)
+        if index != -1:
+            myaction = actions[index]
+            self.assertTrue(regex.search(getattr(myaction, field)),
+                            "Not found a matching pattern in actions:\n"
+                            "index=%s field=%s pattern=%r\n"
+                            "action_line=creation: %s, is_a: %s, type: %s, "
+                            "status: %s, planned: %s, command: %s" % (
+                                index, field, pattern, myaction.creation_time, myaction.is_a,
+                                myaction.type, myaction.status, myaction.t_to_go, myaction.command))
+            return
+
+        for myaction in actions:
+            if regex.search(getattr(myaction, field)):
+                return
+
+        self.assertTrue(False,
+                        "Not found a matching pattern in actions:\nfield=%s pattern=%r\n" %
+                        (field, pattern))
 
     def assert_log_match(self, pattern, index=None):
         """
@@ -600,7 +672,7 @@ class AlignakTest(unittest.TestCase):
 
     def _any_check_match(self, pattern, field, assert_not):
         """
-        Search if any chek matches the requested pattern
+        Search if any check matches the requested pattern
 
         @verified
         :param pattern:
@@ -609,7 +681,8 @@ class AlignakTest(unittest.TestCase):
         :return:
         """
         regex = re.compile(pattern)
-        checks = sorted(self.schedulers['scheduler-master'].sched.checks.values(), key=lambda x: x.creation_time)
+        checks = sorted(self.schedulers['scheduler-master'].sched.checks.values(),
+                        key=lambda x: x.creation_time)
         for check in checks:
             if re.search(regex, getattr(check, field)):
                 self.assertTrue(not assert_not,
@@ -692,6 +765,56 @@ class AlignakTest(unittest.TestCase):
         :return:
         """
         self._any_log_match(pattern, assert_not=True)
+
+    def _any_brok_match(self, pattern, level, assert_not):
+        """
+        Search if any brok message in the Scheduler broks matches the requested pattern and
+        requested level
+
+        @verified
+        :param pattern:
+        :param assert_not:
+        :return:
+        """
+        regex = re.compile(pattern)
+
+        monitoring_logs = []
+        for brok in self._sched.brokers['broker-master']['broks'].itervalues():
+            if brok.type == 'monitoring_log':
+                data = unserialize(brok.data)
+                monitoring_logs.append((data['level'], data['message']))
+                if re.search(regex, data['message']) and (level is None or data['level'] == level):
+                    self.assertTrue(not assert_not, "Found matching brok:\n"
+                                    "pattern = %r\nbrok message = %r" % (pattern, data['message']))
+                    return
+
+        self.assertTrue(assert_not, "No matching brok found:\n"
+                                    "pattern = %r\n" "brok message = %r" % (pattern,
+                                                                            monitoring_logs))
+
+    def assert_any_brok_match(self, pattern, level=None):
+        """
+        Search if any brok message in the Scheduler broks matches the requested pattern and
+        requested level
+
+        @verified
+        :param pattern:
+        :param scheduler:
+        :return:
+        """
+        self._any_brok_match(pattern, level, assert_not=False)
+
+    def assert_no_brok_match(self, pattern, level=None):
+        """
+        Search if no brok message in the Scheduler broks matches the requested pattern and
+        requested level
+
+        @verified
+        :param pattern:
+        :param scheduler:
+        :return:
+        """
+        self._any_brok_match(pattern, level, assert_not=True)
 
     def get_log_match(self, pattern):
         regex = re.compile(pattern)
