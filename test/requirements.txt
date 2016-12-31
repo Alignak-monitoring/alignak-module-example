@@ -3,6 +3,7 @@
 # alignak
 -e git+https://github.com/Alignak-monitoring/alignak.git@develop#egg=alignak
 
+unittest2
 # Use py.test as test-runner
 pytest
 pytest-cov
