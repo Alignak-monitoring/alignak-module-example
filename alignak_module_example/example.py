@@ -368,7 +368,7 @@ class Example(BaseModule):
             try:
                 l = self.to_q.get()
             except Exception as exp:
-                print("Queue get failed: %s", str(exp))
+                print("Queue get failed, exception: %s" % str(exp))
                 continue
             else:
                 for b in l:
