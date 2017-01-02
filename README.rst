@@ -130,6 +130,9 @@ To build a new module EXAMPLE2:
 
         * ``setup.py`` should not be modified for most of the modules ... if necessary, do it with much care!
 
+The ``example.py`` contains all the possible methods that are to be used in the different daemon
+types. Remove unuseful functions and adapt the remaining ones to your neads. If you create an
+external broker module, do not forget to uncomment the main function :)
 And that's it!
 
 Then, to build and make your module available to the community, you must use the standard Python setuptools:
