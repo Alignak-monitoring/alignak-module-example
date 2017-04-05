@@ -25,6 +25,7 @@ them to a Python logger configured in the module configuration file
 
 import time
 import logging
+import Queue
 import inspect
 
 from alignak.basemodule import BaseModule
@@ -361,22 +362,20 @@ class Example(BaseModule):
         logger.info("starting...")
 
         while not self.interrupted:
-            logger.debug("queue length: %s", self.to_q.qsize())
-            start = time.time()
-
-            # Get message in the queue
             try:
-                l = self.to_q.get()
-            except Exception as exp:
-                print("Queue get failed, exception: %s" % str(exp))
-                continue
-            else:
-                for b in l:
-                    # Prepare and manage each brok in the queue message
-                    b.prepare()
-                    self.manage_brok(b)
+                logger.debug("queue length: %s", self.to_q.qsize())
+                start = time.time()
 
-            logger.debug("time to manage %s broks (%d secs)", len(l), time.time() - start)
+                message = self.to_q.get_nowait()
+                for brok in message:
+                    # Prepare and manage each brok in the queue message
+                    brok.prepare()
+                    self.manage_brok(brok)
+
+                logger.debug("time to manage %s broks (%d secs)", len(message), time.time() - start)
+            except Queue.Empty:
+                # logger.debug("No message in the module queue")
+                time.sleep(0.1)
 
         logger.info("stopping...")
 
