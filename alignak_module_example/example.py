@@ -132,11 +132,39 @@ class Example(BaseModule):
         """This function is called after conf file reading"""
         logger.info("Test - Example in %s for daemon: %s", inspect.stack()[0][3], daemon)
 
+    def get_alignak_configuration(self):
+        """This function must return a list of Alignak configuration parameters
+        (variables, MACROS, ...)
+
+        This is useful when your module allows to import configuration
+        """
+        logger.info("Test - Example in %s", inspect.stack()[0][3])
+
+        configuration = {
+            u'process_performance_data': True,
+            u'passive_service_checks_enabled': True,
+            u'event_handlers_enabled': True,
+            u'global_host_event_handler': None,
+            u'global_service_event_handler': None,
+            u'interval_length': 60,
+            u'check_external_commands': True,
+            u'passive_host_checks_enabled': True,
+            u'check_host_freshness': True,
+            u'check_service_freshness': True,
+            u'notifications_enabled': True,
+            u'flap_detection_enabled': True,
+            u'active_service_checks_enabled': True,
+            u'active_host_checks_enabled': True
+        }
+
+        logger.info("Returning Alignak configuration to the Arbiter: %s", str(configuration))
+        return r
+
     def get_objects(self):
         """This function must return a list of config
         objects (hosts, services, commands, ...)
 
-        This is usefull when your module import object from external database
+        This is useful when your module allows to import objects from external database
         """
         logger.info("Test - Example in %s", inspect.stack()[0][3])
 
