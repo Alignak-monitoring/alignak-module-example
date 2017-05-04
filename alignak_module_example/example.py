@@ -158,7 +158,7 @@ class Example(BaseModule):
         }
 
         logger.info("Returning Alignak configuration to the Arbiter: %s", str(configuration))
-        return r
+        return configuration
 
     def get_objects(self):
         """This function must return a list of config
