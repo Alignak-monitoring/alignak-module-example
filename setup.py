@@ -49,7 +49,7 @@ for subdir, dirs, files in os.walk(package_name):
                                      "", subdir))
 
     if target is None:
-        print("Ignoring directory: %s" % (subdir))
+        print(("Ignoring directory: %s" % (subdir)))
         continue
 
     package_files = []
@@ -64,9 +64,9 @@ for subdir, dirs, files in os.walk(package_name):
         data_files.append((target, package_files))
 
 for (target, origin) in data_files:
-    print("Target directory: %s:" % (target))
+    print(("Target directory: %s:" % (target)))
     for file in origin:
-        print(" - %s" % (file))
+        print((" - %s" % (file)))
 print("====================================================\n")
 
 setup(

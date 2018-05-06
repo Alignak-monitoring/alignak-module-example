@@ -25,7 +25,7 @@ them to a Python logger configured in the module configuration file
 
 import time
 import logging
-import Queue
+import queue
 import inspect
 
 from alignak.basemodule import BaseModule
@@ -141,20 +141,20 @@ class Example(BaseModule):
         logger.info("Test - Example in %s", inspect.stack()[0][3])
 
         configuration = {
-            u'process_performance_data': True,
-            u'passive_service_checks_enabled': True,
-            u'event_handlers_enabled': True,
-            u'global_host_event_handler': None,
-            u'global_service_event_handler': None,
-            u'interval_length': 60,
-            u'check_external_commands': True,
-            u'passive_host_checks_enabled': True,
-            u'check_host_freshness': True,
-            u'check_service_freshness': True,
-            u'notifications_enabled': True,
-            u'flap_detection_enabled': True,
-            u'active_service_checks_enabled': True,
-            u'active_host_checks_enabled': True
+            'process_performance_data': True,
+            'passive_service_checks_enabled': True,
+            'event_handlers_enabled': True,
+            'global_host_event_handler': None,
+            'global_service_event_handler': None,
+            'interval_length': 60,
+            'check_external_commands': True,
+            'passive_host_checks_enabled': True,
+            'check_host_freshness': True,
+            'check_service_freshness': True,
+            'notifications_enabled': True,
+            'flap_detection_enabled': True,
+            'active_service_checks_enabled': True,
+            'active_host_checks_enabled': True
         }
 
         logger.info("Returning Alignak configuration to the Arbiter: %s", str(configuration))
@@ -401,7 +401,7 @@ class Example(BaseModule):
                     self.manage_brok(brok)
 
                 logger.debug("time to manage %s broks (%d secs)", len(message), time.time() - start)
-            except Queue.Empty:
+            except queue.Empty:
                 # logger.debug("No message in the module queue")
                 time.sleep(0.1)
 

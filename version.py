@@ -9,22 +9,22 @@
     Alignak - Daemon module as an example to build other modules
 """
 # Package name
-__pkg_name__ = u"alignak_module_EXAMPLE"
+__pkg_name__ = "alignak_module_EXAMPLE"
 
 # Module type for PyPI keywords
 # Used for:
 # - PyPI keywords
-__module_types__ = u"example"
+__module_types__ = "example"
 
 # Application manifest
-__version__ = u"0.4.1"
-__author__ = u"Frédéric Mohier"
-__author_email__ = u"frederic.mohier@alignak.net"
-__copyright__ = u"(c) 2015-2017 - %s" % __author__
-__license__ = u"GNU Affero General Public License, version 3"
-__git_url__ = u"https://github.com/Alignak-monitoring/alignak-module-example"
-__doc_url__ = u"http://alignak-doc.readthedocs.io/en/latest"
-__description__ = u"Alignak - Daemon module as an example to build other modules"
+__version__ = "0.5.0"
+__author__ = "Frédéric Mohier"
+__author_email__ = "frederic.mohier@alignak.net"
+__copyright__ = "(c) 2015-2017 - %s" % __author__
+__license__ = "GNU Affero General Public License, version 3"
+__git_url__ = "https://github.com/Alignak-monitoring/alignak-module-example"
+__doc_url__ = "http://alignak-doc.readthedocs.io/en/latest"
+__description__ = "Alignak - Daemon module as an example to build other modules"
 
 __classifiers__ = [
     'Development Status :: 5 - Production/Stable',
