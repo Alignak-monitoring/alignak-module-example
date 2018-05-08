@@ -17,7 +17,7 @@ __pkg_name__ = "alignak_module_EXAMPLE"
 __module_types__ = "example"
 
 # Application manifest
-__version__ = "0.5.0"
+__version__ = "0.5.1"
 __author__ = "Frédéric Mohier"
 __author_email__ = "frederic.mohier@alignak.net"
 __copyright__ = "(c) 2015-2017 - %s" % __author__
