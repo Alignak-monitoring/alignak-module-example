@@ -25,7 +25,8 @@ them to a Python logger configured in the module configuration file
 
 import time
 import logging
-from queue import Queue as queue
+from queue import Queue
+from queue import Empty
 import inspect
 
 from alignak.basemodule import BaseModule
@@ -389,6 +390,9 @@ class Example(BaseModule):
 
         logger.info("starting...")
 
+        if self.to_q is None:
+            self.to_q = Queue()
+
         while not self.interrupted:
             try:
                 logger.debug("queue length: %s", self.to_q.qsize())
@@ -401,10 +405,33 @@ class Example(BaseModule):
                     self.manage_brok(brok)
 
                 logger.debug("time to manage %s broks (%d secs)", len(message), time.time() - start)
-            except queue.Empty:
+            except Empty:
                 # logger.debug("No message in the module queue")
                 time.sleep(0.1)
 
         logger.info("stopping...")
 
         logger.info("stopped")
+
+if __name__ == '__main__':
+    logging.getLogger("alignak.module.example").setLevel(logging.DEBUG)
+    logger.setLevel(logging.DEBUG)
+
+    # Create an Alignak module
+    from alignak.objects.module import Module
+    from alignak.modulesmanager import ModulesManager
+    mod = Module({
+        'module_alias': 'example',
+        'module_types': 'example',
+        'python_name': 'alignak_module_example',
+        # # Alignak backend configuration
+        # 'alignak_backend': 'http://127.0.0.1:5000',
+        # # 'token': '1489219787082-4a226588-9c8b-4e17-8e56-c1b5d31db28e',
+        # 'username': 'admin', 'password': 'admin',
+        # # Set Arbiter address as empty to not poll the Arbiter else the test will fail!
+        # 'alignak_host': '',
+        # 'alignak_port': 7770,
+    })
+
+    mod = Example(mod)
+    mod.main()
