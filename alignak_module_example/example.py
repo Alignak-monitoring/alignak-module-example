@@ -25,7 +25,7 @@ them to a Python logger configured in the module configuration file
 
 import time
 import logging
-import queue
+from queue import Queue
 import inspect
 
 from alignak.basemodule import BaseModule

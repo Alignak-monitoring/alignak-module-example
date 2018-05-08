@@ -1,7 +1,5 @@
 # Python requirements for unit tests
 -r ../requirements.txt
-# alignak
--e git+https://github.com/Alignak-monitoring/alignak.git@develop#egg=alignak
 
 unittest2
 # Use py.test as test-runner
@@ -12,8 +10,8 @@ coverage
 # Report coverage results to coveralls.io
 coveralls
 # Static code analysis libraries
-pylint
-pep8
-pep257
+# pylint
+# pycodestyle
+# pep257
 # Tests time freeze
 freezegun
