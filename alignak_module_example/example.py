@@ -405,7 +405,8 @@ class Example(BaseModule):
                         brok.prepare()
                         self.manage_brok(brok)
 
-                logger.debug("time to manage %s broks (%d secs)", len(message), time.time() - start)
+                    logger.debug("time to manage %s broks (%d secs)", len(message),
+                                 time.time() - start)
             except Empty:
                 # logger.debug("No message in the module queue")
                 time.sleep(0.1)
