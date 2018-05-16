@@ -399,10 +399,11 @@ class Example(BaseModule):
                 start = time.time()
 
                 message = self.to_q.get_nowait()
-                for brok in message:
-                    # Prepare and manage each brok in the queue message
-                    brok.prepare()
-                    self.manage_brok(brok)
+                if message:
+                    for brok in message:
+                        # Prepare and manage each brok in the queue message
+                        brok.prepare()
+                        self.manage_brok(brok)
 
                 logger.debug("time to manage %s broks (%d secs)", len(message), time.time() - start)
             except Empty:
